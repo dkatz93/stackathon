@@ -13,7 +13,7 @@ class ImageUploaded extends React.Component {
 					source={this.props.uploadedImg.img}
 					style={styles.image}
 				 />
-				<Text>{this.props.uploadedImg.tags.join(', ')}</Text>
+				<Text></Text>
 			</View>
 		);
 	}
@@ -45,7 +45,8 @@ const styles = {
 
 function mapStateToProps(state){
 	return {
-		uploadedImg: state.uploadedImg
+		uploadedImg: state.uploadedImg,
+		searchResults: state.searchResults
 	}
 }
 

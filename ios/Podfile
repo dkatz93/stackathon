@@ -7,6 +7,8 @@ target 'stackathon' do
 
   # Pods for stackathon
 
+  pod 'Firebase/Core'
+
   target 'stackathonTests' do
     inherit! :search_paths
     # Pods for testing

@@ -7,9 +7,13 @@ var app = new Clarifai.App(
   'ma9jFjdtKtjtgYHSbyvK5_J40xy8ZiNnCcfgSLIN'
 );
 
+import {getImageResults, makeGoogleSearch} from './searchResults'
+
+
 let initialState = {
 	img: null,
-	tags: null
+	tags: null,
+	topTags: []
 }
 
 const reducer = (state=initialState, action) => {
@@ -25,6 +29,9 @@ const reducer = (state=initialState, action) => {
 		case SET_TAGS:
 			newState.tags = action.tags
 			break;
+		case SET_TOP_TAGS:
+			newState.topTags = action.topTags
+			break;
 		default: 
 			return state;
 	}
@@ -37,6 +44,7 @@ const reducer = (state=initialState, action) => {
 const SET_IMAGE = 'SET_IMAGE'
 const CLEAR_IMAGE = 'CLEAR_IMAGE'
 const SET_TAGS = 'SET_TAGS'
+const SET_TOP_TAGS = 'SET_TOP_TAGS'
 
 // --------- Action Creators ---------
 
@@ -57,6 +65,12 @@ export const setTags = (tags) => ({
 })
 
 
+export const setTopTags = (topTags) => ({
+	type: SET_TOP_TAGS,
+	topTags: topTags
+})
+
+
 var options = {
   title: 'Select an Image',
   storageOptions: {
@@ -69,7 +83,6 @@ var options = {
 export const setUploadedImg = () => {
 	return (dispatch) => {
 		ImagePicker.showImagePicker(options, (response) => {
-	    console.log('Response = ', response);
 	    if (response.didCancel) {
 	      console.log('User cancelled image picker');
 	    }
@@ -82,18 +95,34 @@ export const setUploadedImg = () => {
 	      dispatch(setImage(source))
 	      app.models.predict(Clarifai.GENERAL_MODEL, {base64:response.data})
 	      .then((res) => {
-	      	console.log('resdata', res)
-				  let tags = [];
-				  for (let i = 0; i<res.outputs[0].data.concepts.length; i++) {
-				    tags.push(res.outputs[0].data.concepts[i].name);
+				  let tags = {};
+				  let tagData = res.outputs[0].data
+				  for (let i = 0; i<tagData.concepts.length; i++) {
+				  	tags[tagData.concepts[i].value] = tagData.concepts[i].name
 				  }
 				  dispatch(setTags(tags))
+				  dispatch(getTopThreeTags(tags))
 				},
 				(error)=>{
 				  console.log(error);  
 				});
 	    }
 	  });
+	}
+}
+
+export const getTopThreeTags = (tags) => {
+	return (dispatch) => {
+		let orderedTags = Object.keys(tags).sort();
+		let topTagArray = [];
+		let len = orderedTags.length
+		topTagArray.push(tags[orderedTags[len-1]], tags[orderedTags[len-2]], tags[orderedTags[len-3]], tags[orderedTags[len-4]])
+		if (topTagArray.indexOf('no person') > -1) {
+			topTagArray.splice(topTagArray.indexOf('no person'), 1)
+		}
+		console.log('TOP TAGS', topTagArray)
+		dispatch(setTopTags(topTagArray))
+		dispatch(makeGoogleSearch(topTagArray))
 	}
 }
 

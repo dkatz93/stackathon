@@ -21,6 +21,7 @@ class CreateSearch extends React.Component {
 	}
 
 	render() {
+		console.log(this.props)
 		return (
 			<View style={styles.container}>
 		  	{ !this.props.uploadedImg.img  ?
@@ -93,7 +94,8 @@ const styles = {
 
 function mapStateToProps(state){
 	return {
-		uploadedImg: state.uploadedImg
+		uploadedImg: state.uploadedImg,
+		searchResults: state.searchResults
 	}
 }
 
