@@ -6,14 +6,14 @@ const ImagePicker = require('react-native-image-picker');
 
 class ImageUploaded extends React.Component {
 	render() {
-		console.log(this.props.uploadedImg)
-		console.log('PROPS', this.props)
+		const tags = this.props.uploadedImg.tags.join(', ')
 		return (
 			<View style={styles.container}>
 				<Image 
-					source={this.props.uploadedImg}
+					source={this.props.uploadedImg.img}
 					style={styles.image}
 				 />
+				<Text>{this.props.uploadedImg.tags.join(', ')}</Text>
 			</View>
 		);
 	}
